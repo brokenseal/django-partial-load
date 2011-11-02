@@ -20,8 +20,12 @@ def render_template_blocks(template, block_list, context):
 
 def render_template_blocks_nodelist(nodelist, block_list, context):
     block_map = {}
-    
+
+    print "nodelist: %s" % nodelist
+
     for node in nodelist:
+        print "node name: %s" % node.name
+
         if isinstance(node, BlockNode) and node.name in block_list:
             block_map.setdefault(node.name, node.render(context))
             
@@ -32,6 +36,7 @@ def render_template_blocks_nodelist(nodelist, block_list, context):
                 except:
                     pass
                 else:
+                    print "inner_block_map 1: %s" % inner_block_map
                     block_map.update(inner_block_map)
                     inner_block_map = {}
                     
@@ -42,6 +47,7 @@ def render_template_blocks_nodelist(nodelist, block_list, context):
             except BlockNotFound:
                 pass
             else:
+                print "inner_block_map 2: %s" % inner_block_map
                 block_map.update(inner_block_map)
                             
     return block_map
