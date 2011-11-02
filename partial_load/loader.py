@@ -3,6 +3,7 @@ from django.template import loader, Context, RequestContext
 from django.http import HttpResponse
 
 
+
 class BlockNotFound(Exception):
     pass
 
@@ -28,7 +29,7 @@ def render_template_blocks_nodelist(nodelist, block_list, context):
         
         if isinstance(node, BlockNode) and node.name in block_list:
             print "node name: %s" % node.name
-            block_map.setdefault(node.name, node.render(context))
+            block_map.setdefault(node.name, node.render(Context(context)))
             
         for key in ('nodelist', 'nodelist_true', 'nodelist_false'):
             if hasattr(node, key):
