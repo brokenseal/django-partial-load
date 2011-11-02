@@ -1,6 +1,8 @@
 from django.template.loader_tags import BlockNode, ExtendsNode
 from django.template import loader, Context, RequestContext
+from django.http import HttpResponse
 
+from django.template.base import SimpleNode
 
 
 class BlockNotFound(Exception):
@@ -25,7 +27,7 @@ def render_template_blocks_nodelist(nodelist, block_list, context):
 
     for node in nodelist:
         print "node class: %s" % node.__class__.__name__
-
+        
         if isinstance(node, BlockNode) and node.name in block_list:
             print "node name: %s" % node.name
             block_map.setdefault(node.name, node.render(context))
@@ -33,7 +35,7 @@ def render_template_blocks_nodelist(nodelist, block_list, context):
         for key in ('nodelist', 'nodelist_true', 'nodelist_false'):
             if hasattr(node, key):
                 try:
-                    inner_block_map = render_template_block_nodelist(getattr(node, key), block_list, context)
+                    inner_block_map = render_template_blocks_nodelist(getattr(node, key), block_list, context)
                 except:
                     pass
                 else:
@@ -44,7 +46,7 @@ def render_template_blocks_nodelist(nodelist, block_list, context):
     for node in nodelist:
         if isinstance(node, ExtendsNode):
             try:
-                inner_block_map = render_template_block(node.get_parent(context), block_list, context)
+                inner_block_map = render_template_blocks(node.get_parent(context), block_list, context)
             except BlockNotFound:
                 pass
             else:
@@ -58,7 +60,6 @@ def render_block_to_string(template_name, block_list, dictionary={}, context_ins
     Loads the given template_name and renders the given block with the given dictionary as
     context. Returns a string.
     """
-    dictionary = dictionary or {}
     template = get_template(template_name)
     
     if context_instance is not None:
@@ -68,15 +69,15 @@ def render_block_to_string(template_name, block_list, dictionary={}, context_ins
         
     template.render(context_instance)
     
-    return render_template_block(template, block_list, context_instance)
+    return render_template_blocks(template, block_list, context_instance)
 
-def direct_block_to_template(request, template, block, extra_context=None, mimetype=None, **kwargs):
+def direct_block_to_template(request, template, block_list, extra_context=None, mimetype=None, **kwargs):
     """
     Render a given block in a given template with any extra URL parameters in the context as
     ``{{ params }}``.
     """
     if extra_context is None:
-    	extra_context = {}
+        extra_context = {}
     dictionary = {'params': kwargs}
     for key, value in extra_context.items():
         if callable(value):
@@ -86,4 +87,4 @@ def direct_block_to_template(request, template, block, extra_context=None, mimet
     c = RequestContext(request, dictionary)
     t = get_template(template)
     t.render(c)
-    return HttpResponse(render_template_block(t, block, c), mimetype=mimetype)
+    return HttpResponse(render_template_blocks(t, block_list, c), mimetype=mimetype)
