@@ -24,9 +24,10 @@ def render_template_blocks_nodelist(nodelist, block_list, context):
     print "nodelist: %s" % nodelist
 
     for node in nodelist:
-        print "node name: %s" % node.name
+        print "node class: %s" % node.__class__.__name__
 
         if isinstance(node, BlockNode) and node.name in block_list:
+            print "node name: %s" % node.name
             block_map.setdefault(node.name, node.render(context))
             
         for key in ('nodelist', 'nodelist_true', 'nodelist_false'):
