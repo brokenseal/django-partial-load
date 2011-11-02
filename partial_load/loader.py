@@ -2,8 +2,6 @@ from django.template.loader_tags import BlockNode, ExtendsNode
 from django.template import loader, Context, RequestContext
 from django.http import HttpResponse
 
-from django.template.base import SimpleNode
-
 
 class BlockNotFound(Exception):
     pass
@@ -87,4 +85,5 @@ def direct_block_to_template(request, template, block_list, extra_context=None, 
     c = RequestContext(request, dictionary)
     t = get_template(template)
     t.render(c)
+    
     return HttpResponse(render_template_blocks(t, block_list, c), mimetype=mimetype)
