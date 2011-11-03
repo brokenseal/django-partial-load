@@ -1,6 +1,8 @@
-from django.template.response import HttpResponse, SimpleTemplateResponse
-from partial_load import loader
 from json import dumps
+
+from django.template.response import HttpResponse, SimpleTemplateResponse
+
+from partial_load import loader
 
 
 def partial_load(func):
@@ -12,7 +14,8 @@ def partial_load(func):
                 raise Exception("The response must be an instance of TemplateResponse.")
 
             block_list = request.META['HTTP_X_LOAD_BLOCKS'].split(',')
-            result = loader.render_template_blocks(response.template, block_list, response.context)
+            template = loader.get_template(response.template_name)
+            result = loader.render_template_blocks(template, block_list, response.context_data)
 
             return HttpResponse(dumps(result), mimetype="application/json")
 
