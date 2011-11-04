@@ -12,10 +12,9 @@ def partial_load(func):
         if request.is_ajax() and request.META.has_key('HTTP_X_LOAD_BLOCKS'):
             if not isinstance(response, SimpleTemplateResponse):
                 raise Exception("The response must be an instance of TemplateResponse.")
-
+            
             block_list = request.META['HTTP_X_LOAD_BLOCKS'].split(',')
-            template = loader.get_template(response.template_name)
-            result = loader.render_template_blocks(template, block_list, response.context_data)
+            result = loader.render_template_blocks(response.template_name, block_list, response.context_data)
 
             return HttpResponse(dumps(result), mimetype="application/json")
 

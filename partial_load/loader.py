@@ -1,5 +1,6 @@
 from django.template.loader_tags import BlockNode, ExtendsNode
 from django.template import loader, Context
+from django.template.base import Template
 
 
 
@@ -13,6 +14,10 @@ def render_template_blocks(template, block_list, context):
         Renders a list of blocks from a template.
         Return a dictionary of rendered template blocks.
     """
+
+    if not isinstance(template, Template):
+        template = get_template(template)
+            
     return render_blocks(template.nodelist, block_list, context)
 
 def render_blocks(nodelist, block_list, context):
